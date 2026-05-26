@@ -5,12 +5,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Recibir texto del frontend
     const { text } = req.body;
 
-    // Llamada a Google AI (Gemini)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${process.env.GOOGLE_API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -21,30 +19,34 @@ export default async function handler(req, res) {
             {
               parts: [
                 {
-                  text: `Traduce este texto de Manglish a español de forma natural:\n${text}`
-                }
-              ]
-            }
-          ]
+                  text: `Traduce este texto de Manglish a español de forma natural:\n${text}`,
+                },
+              ],
+            },
+          ],
         }),
       }
     );
 
-    // Convertir respuesta
     const data = await response.json();
 
-    // Extraer resultado
-    const result =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "Error";
+    let result;
 
-    // Enviar respuesta
+    if (data.candidates && data.candidates.length > 0) {
+      result = data.candidates[0].content.parts[0].text;
+    } else if (data.error) {
+      result = "ERROR GOOGLE: " + JSON.stringify(data.error);
+    } else {
+      result = "RESPUESTA DESCONOCIDA: " + JSON.stringify(data);
+    }
+
     return res.status(200).json({
-      result: result
+      result: result,
     });
 
   } catch (error) {
     return res.status(500).json({
-      result: "Error del servidor"
+      result: "Error del servidor",
     });
   }
 }
