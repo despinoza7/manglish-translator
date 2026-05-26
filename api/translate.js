@@ -4,9 +4,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ✅ SOLUCIÓN: parsear correctamente el body
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
     const text = body.text;
 
     if (!text) {
@@ -41,16 +39,14 @@ export default async function handler(req, res) {
     if (data.candidates && data.candidates.length > 0) {
       result = data.candidates[0].content.parts[0].text;
     } else if (data.error) {
-      result = "ERROR GOOGLE: " + JSON.stringify(data.error);
+      result = JSON.stringify(data.error);
     } else {
-      result = "RESPUESTA DESCONOCIDA: " + JSON.stringify(data);
+      result = JSON.stringify(data);
     }
 
     return res.status(200).json({ result });
-
   } catch (error) {
-    return res.status(500).json({
-      result: "Error del servidor: " + error.message
-    });
+    return res.status(500).json({ result: error.message });
   }
 }
+``
