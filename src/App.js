@@ -6,7 +6,7 @@ export default function App() {
 
   const traducir = async () => {
     try {
-      const response = await fetch("/api/translate", {
+      const response = await fetch("https://manglish-translator.vercel.app/api/translate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
